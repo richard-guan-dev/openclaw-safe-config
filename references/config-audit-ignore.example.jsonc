@@ -1,0 +1,21 @@
+{
+  // Suppress accepted findings that are noisy but intentionally tolerated.
+  "ignore": [
+    {
+      "kind": "alias_target_unknown",
+      "alias": "vertex-gemini-flash"
+    },
+    {
+      "kind": "alias_target_unknown",
+      "alias": "vertex-opus-4.6"
+    },
+    {
+      "kind": "alias_target_unknown",
+      "alias": "vertex-sonnet-4.6"
+    },
+    {
+      "kind": "inline_secret_candidate",
+      "pathRegex": "^channels\\.discord\\.token$"
+    }
+  ]
+}
