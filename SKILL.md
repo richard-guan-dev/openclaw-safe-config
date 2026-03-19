@@ -24,7 +24,7 @@ Use this skill whenever an OpenClaw change could strand the running gateway.
 6. If the change touches models or aliases, search active docs/scripts for live references and update active operator docs. Leave historical memory/media transcripts alone unless they drive current automation.
 7. Apply the candidate with the bundled safe-apply script.
 8. Treat `openclaw gateway health` as the real readiness check; process-alive alone is not enough.
-9. Review `~/.openclaw/logs/config-history.jsonl` (or `OPENCLAW_SAFE_CONFIG_HISTORY`) for an audit trail of apply outcomes.
+9. Review `~/.openclaw/logs/config-history.jsonl` (or `OPENCLAW_SAFE_CONFIG_HISTORY`) for an audit trail of apply outcomes, and inspect persistent per-run logs under `~/.openclaw/logs/safe-config/` (or `OPENCLAW_SAFE_CONFIG_LOG_DIR`) when you need validate/restart/health/rollback details.
 10. After success, record the change in today's memory file and write one concise reusable lesson to the relevant self-improving file.
 
 ## Upgrade workflow

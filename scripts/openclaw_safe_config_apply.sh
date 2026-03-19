@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 077
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
   echo "Usage: $0 <candidate-config.json> [timeout-seconds]" >&2
@@ -45,7 +46,9 @@ fi
 TS="$(date -u +%Y%m%d-%H%M%S)"
 BACKUP="${CFG}.bak.${TS}"
 TMP_APPLY="${CFG}.tmpapply.${TS}"
-LOG_BASE="/tmp/openclaw-safe-config-${TS}"
+SAFE_CONFIG_STATE_DIR="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
+SAFE_CONFIG_LOG_DIR="${OPENCLAW_SAFE_CONFIG_LOG_DIR:-$SAFE_CONFIG_STATE_DIR/logs/safe-config}"
+LOG_BASE="${SAFE_CONFIG_LOG_DIR}/openclaw-safe-config-${TS}"
 VALIDATE_LOG="${LOG_BASE}.validate.log"
 RESTART_LOG="${LOG_BASE}.restart.log"
 HEALTH_LOG="${LOG_BASE}.health.log"
@@ -54,7 +57,7 @@ ROLLBACK_SH="${LOG_BASE}.rollback.sh"
 HISTORY_LOG="${OPENCLAW_SAFE_CONFIG_HISTORY:-$HOME/.openclaw/logs/config-history.jsonl}"
 CHECKS=$(( (TIMEOUT_SECONDS + 4) / 5 ))
 
-mkdir -p "$(dirname "$HISTORY_LOG")"
+mkdir -p "$SAFE_CONFIG_LOG_DIR" "$(dirname "$HISTORY_LOG")"
 
 write_history() {
   local status="$1"
@@ -104,6 +107,7 @@ python3 -m json.tool "$CANDIDATE" >/dev/null
 cp -a "$CFG" "$BACKUP"
 cp -a "$CANDIDATE" "$TMP_APPLY"
 mv "$TMP_APPLY" "$CFG"
+chmod 600 "$CFG" 2>/dev/null || true
 
 if ! openclaw config validate >"$VALIDATE_LOG" 2>&1; then
   cp -a "$BACKUP" "$CFG"

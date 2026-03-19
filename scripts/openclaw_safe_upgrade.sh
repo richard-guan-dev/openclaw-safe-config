@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 077
 
 usage() {
   cat >&2 <<'EOF'
@@ -47,7 +48,9 @@ if [[ ! -x "$SMOKE_SCRIPT" ]]; then
 fi
 
 TS="$(date -u +%Y%m%d-%H%M%S)"
-BASE="/tmp/openclaw-safe-upgrade-${TS}"
+SAFE_CONFIG_STATE_DIR="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
+SAFE_UPGRADE_LOG_DIR="${OPENCLAW_SAFE_UPGRADE_LOG_DIR:-$SAFE_CONFIG_STATE_DIR/logs/safe-upgrade}"
+BASE="${SAFE_UPGRADE_LOG_DIR}/openclaw-safe-upgrade-${TS}"
 STATUS_JSON="${BASE}.status.json"
 MANIFEST_JSON="${BASE}.manifest.json"
 DRYRUN_LOG="${BASE}.dryrun.log"
@@ -63,7 +66,7 @@ POST_SMOKE_LOG="${BASE}.post-smoke.log"
 CHECKS=$(( (TIMEOUT_SECONDS + 4) / 5 ))
 PREV_VERSION="$(openclaw -V | tail -n1)"
 
-mkdir -p "$BACKUP_DIR"
+mkdir -p "$SAFE_UPGRADE_LOG_DIR" "$BACKUP_DIR"
 openclaw update status --json >"$STATUS_JSON"
 INSTALL_KIND="$(python3 - "$STATUS_JSON" <<'PY'
 import json, sys
